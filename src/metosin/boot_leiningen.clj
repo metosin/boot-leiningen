@@ -1,10 +1,10 @@
 (ns metosin.boot-leiningen
   (:require [boot.core :refer [get-env deftask]]
-            [boot.util :refer [pp-str]]))
+            [boot.util :refer [pp-str]]
+            [clojure.java.io :as io]))
 
 (defn- generate-lein-project-file! [& {:keys [keep-project] :or {:keep-project true}}]
-  (require 'clojure.java.io)
-  (let [pfile ((resolve 'clojure.java.io/file) "project.clj")
+  (let [pfile (io/file "project.clj")
         {:keys [project version] :as pom} (:task-options (meta #'boot.task.built-in/pom))
         prop #(when-let [x (get pom %2)] [%1 x])
         head (list* 'defproject (or project 'boot-project) (or version "0.0.0-SNAPSHOT")
