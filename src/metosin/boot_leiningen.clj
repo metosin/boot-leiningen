@@ -12,7 +12,8 @@
                       (prop :license :license)
                       (prop :description :description)
                       [:dependencies (get-env :dependencies)
-                       :source-paths (vec (get-env :source-paths))]))
+                       :source-paths (vec (concat (get-env :source-paths)
+                                                  (get-env :resource-paths)))]))
         proj (pp-str (concat head (mapcat identity (get-env :lein))))]
     (if-not keep-project (.deleteOnExit pfile))
     (spit pfile proj)))
