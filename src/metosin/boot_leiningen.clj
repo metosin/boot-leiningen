@@ -1,16 +1,18 @@
 (ns metosin.boot-leiningen
-  (:require [boot.core :refer [get-env]]))
+  (:require [boot.core :refer [get-env deftask]]
+            [boot.util :refer [pp-str]]))
 
 (defn- generate-lein-project-file! [& {:keys [keep-project] :or {:keep-project true}}]
   (require 'clojure.java.io)
   (let [pfile ((resolve 'clojure.java.io/file) "project.clj")
-        {:keys [project version]} (:task-options (meta #'boot.task.built-in/pom))
-        prop #(when-let [x (get-env %2)] [%1 x])
+        {:keys [project version] :as pom} (:task-options (meta #'boot.task.built-in/pom))
+        prop #(when-let [x (get pom %2)] [%1 x])
         head (list* 'defproject (or project 'boot-project) (or version "0.0.0-SNAPSHOT")
                     (concat
                       (prop :url :url)
-                      (prop :license :license)
+                      (when-let [x (get pom :license)] [:licenses (mapv (fn [[name url]] {:name name :url url}) x)])
                       (prop :description :description)
+                      (prop :scm :scm)
                       [:dependencies (get-env :dependencies)
                        :source-paths (vec (concat (get-env :source-paths)
                                                   (get-env :resource-paths)))]))
